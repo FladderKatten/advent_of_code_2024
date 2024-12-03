@@ -33,7 +33,7 @@ int main() {
 		return 0;
 	}
 
-	uint64_t answer = 0;
+	int answer = 0;
 	char* p = text.data();
 	char* pe = text.data() + text.size();
 	char* eof = 0;
