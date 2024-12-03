@@ -50,8 +50,14 @@ int main() {
     }
 
 
-    std::cout << "Total distance: " << total << std::endl;
+    std::cout << "Part 1 Answer : " << total << std::endl;
 
+
+    int score = 0;
+    for (auto& c : left)
+        score += std::count(right.begin(), right.end(), c) * c;
+
+    std::cout << "Part 2 Answer : " << score << std::endl;
 }
 
 
