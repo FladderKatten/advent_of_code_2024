@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
 using Lines = std::vector<std::string>;
 Lines lines;
