@@ -13,7 +13,6 @@ std::string& read_text() {
 	    std::copy(std::istream_iterator<char>(f), std::istream_iterator<char>(), std::back_inserter(text));
 		f.close();
 	}
-	
 	return text;
 }
 
@@ -28,8 +27,6 @@ std::string& read_text() {
 	dont = "don't()" @{ enabled = false;  };
 
 	mul = ("mul(" a "," b ")") @{
-		if (enabled)
-			std::cout << "mul " << a << "*" << b << std::endl;
 		answer1 += a * b;
 		answer2 += enabled? a * b : 0;
 	};
