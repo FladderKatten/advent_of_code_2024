@@ -22,7 +22,7 @@ Lines& read_lines() {
 }
 
 bool matchc(const char c, int row, int col) {
-	if (row >= lines.size() || col >= lines[row].size())
+	if (row >= lines.size() || col >= lines[row].size() || row < 0 || col < 0)
 		return false;
 	return lines[row][col] == c;
 }
@@ -58,11 +58,33 @@ int find_all_from(const std::string& word, int row, int col) {
 	return matches;
 }
 
+bool match_x_mas(int row, int col) {
+    if (match_direction("MAS", row-1, col-1,  1,  1) || match_direction("MAS", row+1, col+1,  -1,  -1))
+	    if (match_direction("MAS", row+1, col-1,  -1,  1) || match_direction("MAS", row-1, col+1,  +1,  -1))
+            return true;
+    return false;
+}
+
 int main() {
 	if (read_lines().empty()) {
 		std::cout << "unable to read input" << std::endl;
 		return 0;
 	}
+
+    /* debug
+    lines = {
+        "MMMSXXMASM",
+        "MSAMXMSMSA",
+        "AMXSXMAAMM",
+        "MSAMASMSMX",
+        "XMASAMXAMM",
+        "XXAMMXXAMA",
+        "SMSMSASXSS",
+        "SAXAMASAAA",
+        "MAMMMXMMMM",
+        "MXMXAXMASX",
+    };
+    //*/
 
 	auto answer1 = 0;
     for (int row = 0; row < lines.size(); row++) {
@@ -71,6 +93,14 @@ int main() {
     	}
     }
 
-    std::cout << "Answer Part 1 : " << answer1 << std::endl << std::endl;
-    //std::cout << "Answer Part 2 : " << answer2 << std::endl;
+
+    auto answer2 = 0;
+    for (int row = 0; row < lines.size(); row++) {
+	    for (int col = 0; col < lines[row].size(); col++) {
+			answer2 += match_x_mas(row, col);
+    	}
+    }
+
+    std::cout << "Answer Part 1 : " << answer1 << std::endl;
+    std::cout << "Answer Part 2 : " << answer2 << std::endl;
 }
