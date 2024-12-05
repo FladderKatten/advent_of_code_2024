@@ -9,4 +9,5 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /advent-2024
 COPY . .
+RUN ["make -B"]
 CMD ["/bin/bash"]
