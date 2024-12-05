@@ -7,18 +7,13 @@ Welcome to my solutions for [Advent of Code 2024](https://adventofcode.com/2024)
 
 In this repository, you’ll find:
 
-- My solutions implemented mostly in **C++** with the use of some parser generators.
-- A focus mix of handmade old-school, modern, lazy, fast, slow and strange approaches.
+- My solutions implemented mostly in **C++**
+- A mix of handmade old-school, modern, lazy, fast, slow and strange approaches.
   
 
 ---
-
-##  🚀 Quick Start
-
   
-###  Building the Project
-
-Easiest way to install it as a container with everything you need, so make sure that all dependencies are included.
+##  🛠️ Building the Project
 
 1. Clone the repository:
 
