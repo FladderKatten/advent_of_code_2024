@@ -1,17 +1,11 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <sstream>
-#include <string>
-#include <algorithm>
-
-
+#include "../common/util.h"
 
 int main() {
+    int answer1 = 0;
+    int answer2 = 0;
+    auto lines = read_file_lines("input.txt");
 
-    std::ifstream f("input.txt");
-
-    if (!f.is_open()) {
+    if (lines.empty()) {
         std::cout << "Error opening file" << std::endl;
         return 0;
     }
@@ -19,48 +13,22 @@ int main() {
     std::vector<int> left;
     std::vector<int> right;
 
-    for (std::string line; std::getline(f, line); ) {
-        std::istringstream ss(line);
-
-        int a, b;
-
-        ss >> a >> b;
-
-        left.push_back(a);
-        right.push_back(b);
-
-        // std::cout << a << " - " << b << std::endl; //
+    for (auto& line : lines) {
+        auto ints = parse_ints(line, "   ");
+        left.push_back(ints.front());
+        right.push_back(ints.back());
     }
-    f.close();
-
-
 
     std::sort(left.begin(), left.end());
     std::sort(right.begin(), right.end());
     std::vector<int> distance;
 
-    for (int i = 0; i < left.size(); i++) {
-        distance.push_back(std::abs(right[i] - left[i])); 
-    }       
+    for (int i = 0; i < left.size(); i++)
+        answer1 += std::abs(right[i] - left[i]); 
 
-
-    int total = 0;
-    for (auto& d : distance) {
-        total += d;
-    }
-
-
-    std::cout << "Part 1 Answer : " << total << std::endl;
-
-
-    int score = 0;
     for (auto& c : left)
-        score += std::count(right.begin(), right.end(), c) * c;
+        answer2 += std::count(right.begin(), right.end(), c) * c;
 
-    std::cout << "Part 2 Answer : " << score << std::endl;
+    std::cout << "Part 1 Answer : " << answer1 << std::endl;
+    std::cout << "Part 2 Answer : " << answer2 << std::endl;
 }
-
-
-
-
-
