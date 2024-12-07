@@ -45,9 +45,9 @@ int main() {
 		if (line.empty())
 			found_empty_line = true;
 		else if (found_empty_line)
-			updates.push_back(line.parse_ints(','));
+			updates.push_back(parse_ints(line, ","));
 		else
-			rules.push_back(line.parse_ints('|'));
+			rules.push_back(parse_ints(line, "|"));
 	};
 
 	for (auto& u : updates) {

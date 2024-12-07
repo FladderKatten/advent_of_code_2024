@@ -11,47 +11,32 @@
 #include <inttypes.h>
 #include <assert.h>
 
-class String;
-
-using StringVector = std::vector<String>;
+using StringVector = std::vector<std::string>;
 using IntVector    = std::vector<int>;
 
-class String
-    : public std::string
-{
-public:
-    using std::string::string;
-
-    String(const std::string& s) : std::string(s) {}
-
-    StringVector tokenize(char delimiter) {
-        auto tokens = StringVector();
-
-        size_t i = 0, end;
-        while ((end = find(delimiter, i)) != npos) {
-            tokens.emplace_back(substr(i, end - i));
-            i = end + 1;
-        }
-
-        tokens.emplace_back(substr(i));
-        return tokens;
+StringVector tokenize(const std::string& s, const std::string& delimiter) {
+    auto tokens = StringVector();
+    size_t i = 0, end;
+    while ((end = s.find(delimiter, i)) != s.npos) {
+        tokens.emplace_back(s.substr(i, end - i));
+        i = end + delimiter.size();
     }
+    tokens.emplace_back(s.substr(i));
+    return tokens;
+}
 
-    IntVector parse_ints(char delimiter) {
-        auto numbers = std::vector<int>();
-        
-        for (const auto& token : tokenize(delimiter)) {
-            numbers.push_back(std::stoi(token));
-        }
+IntVector parse_ints(const std::string& s, const std::string& delimiter) {
+       auto numbers = std::vector<int>();
+       
+       for (auto& token : tokenize(s, delimiter))
+           numbers.push_back(std::stoi(token));
 
-        return numbers;
-    }
+       return numbers;
+}
 
-};
-
-String read_file_raw_text(const std::string& filename) {
+std::string read_file_raw_text(const std::string& filename) {
     auto f    = std::ifstream(filename);
-    auto text = String();
+    auto text = std::string();
 
     if (f.is_open()) {
 	    std::copy(std::istream_iterator<char>(f), std::istream_iterator<char>(), std::back_inserter(text));
@@ -59,7 +44,6 @@ String read_file_raw_text(const std::string& filename) {
 	}
 	return text;
 }
-
 
 StringVector read_file_lines(const std::string& filename) {
     auto f  = std::ifstream(filename);
@@ -86,4 +70,17 @@ namespace std {
         }
         return os;
     }
+
+    ostream& operator<<(ostream& os, const StringVector& vec) {
+        bool first = true;
+        for (auto& v : vec) {
+            if (!first) {
+                os << ", ";
+            }
+            os << "\"" << v << "\"";
+            first = false;
+        }
+        return os;
+    }
 }
+
