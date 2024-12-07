@@ -4,3 +4,6 @@ main:	main.cpp.rl
 
 run:	main
 	./main
+
+clean:
+	rm -rf main main.cpp *.dot *.png
