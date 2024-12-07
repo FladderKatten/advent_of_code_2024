@@ -1,8 +1,9 @@
-main.cpp: main.cpp.rl
+main:	main.cpp.rl
 	ragel main.cpp.rl -o main.cpp
-
-main:	main.cpp main.cpp.rl
 	g++ main.cpp -o main
 
 run:	main
 	./main
+
+clean:
+	rm -rf main main.cpp *.dot *.png

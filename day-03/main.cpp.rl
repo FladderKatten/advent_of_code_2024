@@ -1,20 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <algorithm>
-#include <iterator>
-
-std::string text;
-
-std::string& read_text() {
-    auto f  = std::ifstream("input.txt");
-
-    if (f.is_open()) {
-	    std::copy(std::istream_iterator<char>(f), std::istream_iterator<char>(), std::back_inserter(text));
-		f.close();
-	}
-	return text;
-}
+#include "../common/util.h"
 
 %%{
     machine parser;
@@ -35,7 +19,8 @@ std::string& read_text() {
 }%%
 
 int main() {
-	if (read_text().empty()) {
+	auto text = read_file_raw_text("input.txt");
+	if (text.empty()) {
 		std::cout << "unable to load input" << std::endl;
 		return 0;
 	}

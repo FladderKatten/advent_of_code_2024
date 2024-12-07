@@ -1,8 +1,14 @@
-DAYS := $(wildcard day-*/)
-all: $(DAYS)
+DIRS := $(wildcard day-*/)
+all: $(DIRS)
 	@echo "success"
 
-$(DAYS):
+$(DIRS):
 	@$(MAKE) -C $@
 
-.PHONY: all $(DAYS)
+.PHONY: all $(DIRS)
+
+clean:
+	@for dir in $(DIRS); do \
+		$(MAKE) -C $$dir clean; \
+	done
+	@echo "Clean complete."
