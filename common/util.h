@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <iterator>
 #include <inttypes.h>
 #include <assert.h>
