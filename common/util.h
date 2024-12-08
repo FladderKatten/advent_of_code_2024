@@ -10,6 +10,8 @@
 #include <iterator>
 #include <inttypes.h>
 #include <assert.h>
+#include <thread>
+#include <chrono>
 
 using StringVector = std::vector<std::string>;
 using IntVector    = std::vector<int>;
@@ -84,3 +86,20 @@ namespace std {
     }
 }
 
+
+void delayms(int ms) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+}
+
+namespace ansi {
+    void clear() { std::cout << "\033[2J\033[H"; }
+}
+
+
+bool get_argument_flag(const std::string& name, int argc, char** argv) {
+    for (int i = 1; i < argc; i++)
+        if (name == std::string(argv[i]))
+            return true;
+
+    return false;
+}
