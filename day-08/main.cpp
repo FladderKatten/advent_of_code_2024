@@ -7,8 +7,6 @@ struct Coord {
     Coord(int row = 0, int col = 0)
         : row(row), col(col) {}
 
-    Coord invert() const { return { -row, -col }; }
-
     bool  operator< (const Coord& other) const { return row != other.row? row < other.row : col < other.col; }
     bool  operator> (const Coord& other) const { return row != other.row? row > other.row : col > other.col; }
     bool  operator==(const Coord& other) const { return row == other.row && col == other.col; }
@@ -30,11 +28,15 @@ public:
 
     char& at(const Coord& c) { return StringVector::at(c.row).at(c.col); }
 
-    void print() const {
-        for (auto& row : *this)
-            std::cout << row << std::endl;
-    }
+    void print(int ms_delay) const {
+        ansi::clear();
+        auto s = std::string();
 
+        for (auto& row : *this)
+            s += row + "\n";
+        std::cout << s << std::endl;
+        delayms(ms_delay);
+    }
 };
 
 struct Antenna {
@@ -50,6 +52,11 @@ bool validate_coord(const Coord& coord, const Grid& grid) {
         && coord.col >= 0 && coord.col < grid.width;
 }
 
+void draw_antinode(const Coord& coord, Grid& grid) {
+    if (validate_coord(coord, grid))
+        grid.at(coord) = '#';
+}
+
 void draw_antinodes(const AntennaVector& antennas, Grid& grid) {
     if (antennas.size() < 2)
         return;
@@ -60,16 +67,27 @@ void draw_antinodes(const AntennaVector& antennas, Grid& grid) {
         auto b = antennas[j].pos;
 
         Coord delta = b - a;
-        Coord anti1 = a - delta;
-        Coord anti2 = b + delta;
-
-        if (validate_coord(anti1, grid))
-            grid.at(anti1) = '#';
-        if (validate_coord(anti2, grid))
-            grid.at(anti2) = '#';
+        draw_antinode(a - delta, grid);
+        draw_antinode(b + delta, grid);
     }
 }
 
+void draw_antinodes2(AntennaVector& antennas, Grid& grid) {
+    if (antennas.size() < 2)
+        return;
+
+    for (auto i = 0; i < antennas.size(); i++)
+        for (auto j = i + 1; j < antennas.size(); j++) {
+            auto a = std::min(antennas[i].pos, antennas[j].pos);
+            auto b = std::max(antennas[i].pos, antennas[j].pos);
+
+            auto delta = b - a;
+            for (Coord pt = a; validate_coord(pt, grid); pt = pt - delta)
+                draw_antinode(pt, grid);
+            for (Coord pt = a; validate_coord(pt, grid); pt = pt + delta)
+                draw_antinode(pt, grid);
+    }
+}
 
 int main(int argc, char** argv) {
     auto answer1 = 0;
@@ -99,15 +117,22 @@ int main(int argc, char** argv) {
     for (auto& v : antenna_map) {
         draw_antinodes(v.second, grid);
         if (animate) {
-            ansi::clear();
-            grid.print();
-            msdelay(50);
+            grid.print(50);
         }
     }
 
     for (auto& line : grid)
         answer1 += std::count(line.begin(), line.end(), '#');
 
+    for (auto& v : antenna_map) {
+        draw_antinodes2(v.second, grid);
+        if (animate) 
+            grid.print(50);
+    }
+
+    for (auto& line : grid)
+        answer2 += std::count(line.begin(), line.end(), '#');
+
     std::cout << "Answer Part 1: " << answer1 << std::endl;
-    //std::cout << "Answer Part 2: " << answer2 << std::endl;
+    std::cout << "Answer Part 2: " << answer2 << std::endl;
 }
