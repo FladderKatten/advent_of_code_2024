@@ -68,6 +68,19 @@ struct VM {
 
         return *this;
     }
+
+    std::string output_csv() {
+        std::string result;
+
+        for (size_t i = 0; i < output.size(); i++) {
+            result += output[i];
+            if (i != output.size() - 1)
+                result += ",";
+        }
+
+        return result;
+    }
+
 };
 
 VM parse(const std::string& text) {
@@ -106,7 +119,7 @@ int main() {
         return 0;
     }
 
-    auto answer1 = parse(text).execute().output;
+    auto answer1 = parse(text).execute().output_csv();
 
     std::cout << "Answer 1: " << answer1 << std::endl;
 }
