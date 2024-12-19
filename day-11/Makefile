@@ -1,8 +1,8 @@
-main:	main.go
-	go build main.go
+main:	main.cpp
+		g++ main.cpp -std=c++23 -g -o main
 
-run:	main
-	./main
+run: 	main
+		./main
 
 clean:
-	rm -rf main
+		rm -rf main
