@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <numeric>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -103,3 +104,30 @@ bool get_argument_flag(const std::string& name, int argc, char** argv) {
 
     return false;
 }
+
+class TextBox {
+    std::vector<char> pixels;
+    int height;
+    int width;
+public:
+        TextBox(int width, int height)
+            : width(width)
+            , height(height)
+            , pixels((width+1)* (height+1), ' ')
+        {
+            for (auto i = 0; i < height; i++)
+                pixels.at(i*height + width) = '\n';
+        }
+
+        void set(int x, int y, char c) {
+            pixels[y * width + x] = c;
+        }
+
+        void set_cursor() {}
+
+        void print() {
+            std::cout << pixels.data() << std::endl;
+        }
+
+    private:
+};
