@@ -1,94 +1,84 @@
 #include "../common/util.h"
 
-struct Coord {
-    int row, col;
-
-    Coord(int row = 0, int col = 0)
-        : row(row), col(col) {}
-
-      bool operator<(const Coord& other) { return row != other.row? row < other.row : col < other.col; }
-      bool operator>(const Coord& other) { return row != other.row? row > other.row : col > other.col; }
-    Coord operator==(const Coord& other) { return row == other.row && col == other.col; }
-    Coord operator+ (const Coord& other) { return {row + other.row,   col  + other.col}; }
-};
-
-class Grid
-    : public StringVector
-{
-public:
-    Grid(const StringVector& sv)
-        : StringVector(sv) {}
-
-    char& at(const Coord& c) { return StringVector::at(c.row).at(c.col); }
-
-    std::map<Coord, bool> visited;
-};
-
 struct Guard
-    : public Coord
 {
+    TextGrid& grid;
     Coord north = {-1,  0}; Coord south = { 1,  0};
     Coord east  = { 0,  1}; Coord west  = { 0, -1};
     Coord direction[4] = {north, east, south, west};
-    Coord pos;
-    Grid& grid;
+    Coord current, start;
     int state;
 
+    std::set<Coord> visited;
+
 public:
-    Guard(Grid& grid)
+    Guard(TextGrid& grid)
         : grid(grid)
      {
-        // find the start location
-        for (pos.row = 0; pos.row < grid.size(); pos.row++)
-            for (pos.col = 0; pos.col < grid[pos.row].size(); pos.col++) {
-                if (grid.at(pos) == '^') {
-                    std::cout << "found guard at " << pos.row << ", " << pos.col << std::endl;
-                    return;
-                }
-            }
+        current = start = grid.find_first('^');
+        if (start == Coord())
+            throw std::runtime_error("unable to find guard");
     }
 
-    Coord next_location() { return pos + direction[state]; }
+    Coord next() {
+        return current + direction[state];
+    }
     
-    void move() { pos = next_location(); }
+    void forward() {
+        grid.set(next(), grid.get(current));
+        grid.set(current, ' ');
+        current = next();
+        visited.insert(current);
+    }
 
     void turn() { ++state &= 3; }
 
-    bool is_blocked() { return grid.at(next_location()) == '#'; }
+    bool is_blocked() { return grid.at(next()) == '#'; }
 
-    bool is_exiting() { return next_location().row < 0 || next_location().row >= grid.size()
-                            || next_location().col < 0 || next_location().col >= grid.front().size(); }
+    bool is_exiting() { return grid.out_of_bounds(next()); }
+
+    bool is_looping() { return visited.contains(current) && visited.contains(next()); }
+
+    void simulate(bool animate) {
+        visited.clear();
+        visited.insert(current);
+        ansi::clear();
+
+        while (!grid.out_of_bounds(current)) {
+            ansi::home();
+            if (animate) {
+                grid.zoom_print(current, 50);
+                std::cout << std::endl;
+                delayms(50);
+            }
+
+            if (grid.out_of_bounds(next()))
+                return;
+
+            if (grid.get(next()) == '#')
+                turn();
+
+            forward();
+        }
+    }
 
 };
 
 
-int main() {
-    int answer1 = 0;
-    int answer2 = 0;
+int main(int argc, char** argv) {
+    auto animate = get_argument_flag("--animate", argc, argv);
 
-    Grid grid = read_file_lines("input.txt");
-    if (grid.empty()) {
+    TextGrid lines = read_file_lines("input.txt");
+    if (lines.empty()) {
         std::cout << "unable to load input" << std::endl;
         return 0;
     }
 
-    int rows = grid.size();
-    int cols = grid.front().size();
-
+    auto grid = TextGrid(lines);
     auto guard = Guard(grid);
 
-    auto visited = std::set<std::pair<int, int>>();
-    visited.insert({guard.pos.row, guard.pos.col});
-
-    while (!guard.is_exiting()) {
-        if (guard.is_blocked())
-            guard.turn();
-
-        guard.move();
-        visited.insert({guard.pos.row, guard.pos.col});
-    }
-
-    answer1 = visited.size();
+    guard.simulate(animate);
+    int64_t answer1 = guard.visited.size();
 
     std::cout << "Answer Part 1: " << answer1 << std::endl;
     //std::cout << "Answer Part 2: " << answer2 << std::endl;

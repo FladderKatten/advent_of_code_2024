@@ -1,44 +1,5 @@
 #include "../common/util.h"
 
-
-struct Coord {
-    int row, col;
-
-    Coord(int row = 0, int col = 0)
-        : row(row), col(col) {}
-
-    bool  operator< (const Coord& other) const { return row != other.row? row < other.row : col < other.col; }
-    bool  operator> (const Coord& other) const { return row != other.row? row > other.row : col > other.col; }
-    bool  operator==(const Coord& other) const { return row == other.row && col == other.col; }
-    Coord operator+ (const Coord& other) const { return { row + other.row, col + other.col }; }
-    Coord operator- (const Coord& other) const { return { row - other.row, col - other.col }; }
-};
-
-class Grid
-    : public StringVector
-{
-public:
-    int height;
-    int width;
-
-    Grid(const StringVector& sv)
-        : StringVector(sv)
-        , height(sv.size())
-        , width(sv.front().size()) {}
-
-    char& at(const Coord& c) { return StringVector::at(c.row).at(c.col); }
-
-    void print(int ms_delay) const {
-        ansi::clear();
-        auto s = std::string();
-
-        for (auto& row : *this)
-            s += row + "\n";
-        std::cout << s << std::endl;
-        delayms(ms_delay);
-    }
-};
-
 struct Antenna {
     char  freq;
     Coord pos;
@@ -47,17 +8,12 @@ struct Antenna {
 using AntennaVector = std::vector<Antenna>;
 using AntennaMap    = std::map<char, AntennaVector>;
 
-bool validate_coord(const Coord& coord, const Grid& grid) {
-    return coord.row >= 0 && coord.row < grid.height
-        && coord.col >= 0 && coord.col < grid.width;
-}
-
-void draw_antinode(const Coord& coord, Grid& grid) {
-    if (validate_coord(coord, grid))
+void draw_antinode(const Coord& coord, TextGrid& grid) {
+    if (!grid.out_of_bounds(coord))
         grid.at(coord) = '#';
 }
 
-void draw_antinodes(const AntennaVector& antennas, Grid& grid) {
+void draw_antinodes(const AntennaVector& antennas, TextGrid& grid) {
     if (antennas.size() < 2)
         return;
 
@@ -72,7 +28,7 @@ void draw_antinodes(const AntennaVector& antennas, Grid& grid) {
     }
 }
 
-void draw_antinodes2(AntennaVector& antennas, Grid& grid) {
+void draw_antinodes2(AntennaVector& antennas, TextGrid& grid) {
     if (antennas.size() < 2)
         return;
 
@@ -82,9 +38,9 @@ void draw_antinodes2(AntennaVector& antennas, Grid& grid) {
             auto b = std::max(antennas[i].pos, antennas[j].pos);
 
             auto delta = b - a;
-            for (Coord pt = a; validate_coord(pt, grid); pt = pt - delta)
+            for (Coord pt = a; !grid.out_of_bounds(pt); pt = pt - delta)
                 draw_antinode(pt, grid);
-            for (Coord pt = a; validate_coord(pt, grid); pt = pt + delta)
+            for (Coord pt = a; !grid.out_of_bounds(pt); pt = pt + delta)
                 draw_antinode(pt, grid);
     }
 }
@@ -95,7 +51,7 @@ int main(int argc, char** argv) {
 
     auto animate = get_argument_flag("--animate", argc, argv);
 
-    Grid grid = read_file_lines("input.txt");
+    TextGrid grid = read_file_lines("input.txt");
     if (grid.empty()) {
         std::cout << "unable to load input" << std::endl;
         return 0;
@@ -114,25 +70,31 @@ int main(int argc, char** argv) {
             }
         }
 
+    if (animate) {
+        ansi::clear();
+    }
+
     for (auto& v : antenna_map) {
         draw_antinodes(v.second, grid);
         if (animate) {
-            grid.print(50);
+            ansi::home();
+            grid.print();
+            delayms(50);
         }
     }
 
-    for (auto& line : grid)
-        answer1 += std::count(line.begin(), line.end(), '#');
+    for (auto& c : grid)
+        answer1 += c == '#';
 
     for (auto& v : antenna_map) {
         draw_antinodes2(v.second, grid);
-        if (animate) 
-            grid.print(50);
+        if (animate) {
+            ansi::home();
+            grid.print();
+            delayms(50);
+        }
     }
 
-    for (auto& line : grid)
-        answer2 += std::count(line.begin(), line.end(), '#');
-
     std::cout << "Answer Part 1: " << answer1 << std::endl;
-    std::cout << "Answer Part 2: " << answer2 << std::endl;
+    //std::cout << "Answer Part 2: " << answer2 << std::endl;
 }
