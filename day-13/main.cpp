@@ -53,7 +53,7 @@ std::vector<Machine> parse(const std::string& text) {
 
     for (std::sregex_iterator i = begin; i != end; ++i) {
         match = *i;
-        
+		
 		if (match.size() != 7)
             throw std::invalid_argument("invalid input");
 
@@ -77,7 +77,7 @@ void self_test() {
 int main() {
 	self_test();
 
-	auto text = read_file_as_string("input.txt");
+	auto text = read_file_raw_text("input.txt");
 	if (text.empty()) {
 		std::cout << "unable to load input" << std::endl;
 		return 0;
@@ -89,7 +89,6 @@ int main() {
 	for (const auto& m : machines) {
 		auto tokens = m.bruteforce();
 		answer1 += tokens;
-		//std::cout << "Tokens: " << tokens << std::endl;
 	}
 
     std::cout << "Answer Part 1: " << answer1 << std::endl;

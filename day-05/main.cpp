@@ -1,9 +1,9 @@
 #include "../common/util.h"
 
-using Rule = IntVector;
+using Rule = std::vector<int>;
 using RuleVector = std::vector<Rule>;
 
-using Update = IntVector;
+using Update = std::vector<int>;
 using UpdateVector = std::vector<Update>;
 
 bool validate_update(const Update& update, const RuleVector& rules) {

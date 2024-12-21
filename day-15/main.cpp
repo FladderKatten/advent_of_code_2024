@@ -1,4 +1,3 @@
-#include "../common/textbox.h"
 #include "../common/util.h"
 
 struct Robot
@@ -11,14 +10,9 @@ public:
     Robot(TextGrid& grid)
         : grid(grid)
      {
-        for (int i = 0; i < grid.height; i++)
-            for (int j = 0; j < grid.width; j++)
-                if (grid.at(i, j) == '@') {
-                    start = position = Coord(i, j);
-                    return;
-                }
-
-        throw std::runtime_error("unable to find start location");
+        start = position = grid.find_first('@');
+        if (start == Coord(-1, -1))
+            throw std::runtime_error("unable to find start location");
     }
 
     void push(Coord from, Coord delta) {
@@ -58,7 +52,7 @@ public:
         auto instuctions = code;
 
         auto print_code = [&]() {
-            auto len = std::min(instuctions.length(), size_t(500));
+            auto len = std::min(instuctions.length(), size_t(30));
             std::cout << "[" << i << "] " << instuctions.substr(0, len) << "  " << std::endl;
         };
 

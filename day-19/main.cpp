@@ -1,5 +1,4 @@
 #include "../common/util.h"
-#include "../common/textbox.h"
 
 struct Solver
 {
@@ -9,20 +8,15 @@ struct Solver
     Solver() {}
 
     Solver(const std::vector<std::string>& lines) {
-        for(auto& t : tokenize(lines.front(), ", ")) {
+        for(auto& t : tokenize(lines.front(), ", "))
             combos.push_back(t);
-        }
 
-        std::for_each(lines.begin() + 2, lines.end(), [&](const std::string& s) {
-                designs.push_back(s);
-            });
+        std::copy(lines.begin() + 2, lines.end(), std::back_inserter(designs));
     }
 
     bool solve(const std::string_view& desired) {
         if (desired.empty())
             return true;
-
-        std::vector<int> matches;
 
         for (auto& partial : combos)
             if (desired.starts_with(partial))
@@ -32,7 +26,7 @@ struct Solver
         return false;
     }
 
-    uint64_t solve_all() {
+    int64_t solve_all() {
         return std::count_if(designs.begin(), designs.end(), [&](const std::string& s) {
             return solve(s);
         });
